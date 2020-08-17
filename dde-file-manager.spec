@@ -1,6 +1,6 @@
 Name:           dde-file-manager
 Version:        5.1.2.3
-Release:        7
+Release:        8
 Summary:        Deepin File Manager
 License:        GPLv3
 URL:            https://github.com/linuxdeepin/dde-file-manager
@@ -173,5 +173,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-trash.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Mon Aug 17 2020 chenbo pan <panchenbo@uniontech.com> - 5.1.2.3-8
+- fix spec name
 * Thu Jul 30 2020 openEuler Buildteam <buildteam@openeuler.org> - 5.1.2.3-7
 - Package init

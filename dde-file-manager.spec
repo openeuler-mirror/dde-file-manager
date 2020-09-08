@@ -120,8 +120,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-trash.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.filemanager.filedialog.service
 %{_datadir}/dbus-1/services/org.freedesktop.FileManager.service
 %{_datadir}/dbus-1/system-services/com.deepin.filemanager.daemon.service
-%{_datadir}/dbus-1/dbusservice/com.deepin.filemanager.daemon.policy
-%{_datadir}/dbus-1/pkexec/com.deepin.pkexec.dde-file-manager.policy
+%{_datadir}/polkit-1/actions/com.deepin.filemanager.daemon.policy
+%{_datadir}/polkit-1/actions/com.deepin.pkexec.dde-file-manager.policy
 
 %files -n libdde-file-manager
 %{_libdir}/dde-file-manager/plugins/previews/libdde-image-preview-plugin.so

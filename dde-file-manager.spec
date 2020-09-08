@@ -1,6 +1,6 @@
 Name:           dde-file-manager
 Version:        5.1.2.3
-Release:        8
+Release:        9
 Summary:        Deepin File Manager
 License:        GPLv3
 URL:            https://github.com/linuxdeepin/dde-file-manager
@@ -12,8 +12,9 @@ BuildRequires:  deepin-gettext-tools
 BuildRequires:  dde-dock-devel
 BuildRequires:  file-devel
 BuildRequires:  pkgconfig(atk)
+BuildRequires:  dtkcore-devel
 BuildRequires:  dtkgui-devel
-BuildRequires:  pkgconfig(dtkwidget) >= 5.1
+BuildRequires:  dtkwidget-devel
 BuildRequires:  pkgconfig(dframeworkdbus) >= 2.0
 BuildRequires:  pkgconfig(gtk+-2.0)
 BuildRequires:  pkgconfig(gsettings-qt)
@@ -173,6 +174,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-trash.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Tue Sep 8 2020 chenbo pan <panchenbo@uniontech.com> - 5.1.2.3-9
+- fix compile error
 * Mon Aug 17 2020 chenbo pan <panchenbo@uniontech.com> - 5.1.2.3-8
 - fix spec name
 * Thu Jul 30 2020 openEuler Buildteam <buildteam@openeuler.org> - 5.1.2.3-7

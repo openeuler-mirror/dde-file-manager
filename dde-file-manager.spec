@@ -1,10 +1,10 @@
 Name:           dde-file-manager
-Version:        5.1.2.3
-Release:        9
+Version:        5.2.0.56
+Release:        1
 Summary:        Deepin File Manager
 License:        GPLv3
 URL:            https://github.com/linuxdeepin/dde-file-manager
-Source0:        %{name}-%{version}.tar.bz2
+Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-c++
 BuildRequires:  desktop-file-utils
@@ -45,7 +45,9 @@ BuildRequires:  libmediainfo-devel
 BuildRequires:  kf5-kcodecs-devel
 Requires:       deepin-terminal
 Requires:       dde-desktop
-Requires:       file-roller
+Requires:       jemalloc
+Requires:       libglvnd-glx
+Requires:       libdde-file-manager
 Recommends:     deepin-manual
 
 %description
@@ -61,6 +63,14 @@ Header files and libraries for %{name}.
 %package -n libdde-file-manager
 Summary:        DDE File Manager library
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       kf5-kcodecs
+Requires:       jemalloc
+Requires:       poppler-cpp
+Requires:       libmediainfo
+Requires:       libzen
+Requires:       udisks2-qt5
+Requires:       taglib
+Requires:       libgio-qt
 
 %description -n libdde-file-manager
 DDE File Manager library.
@@ -83,7 +93,8 @@ Requires:       dde-session-ui
 Deepin desktop environment - desktop module.
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup -c -n %{name}-%{version}
+
 
 find -type f -perm 775 -exec chmod 644 {} \;
 sed -i '/deepin-daemon/s|lib|libexec|' dde-zone/mainwindow.h
@@ -102,6 +113,7 @@ export PATH=%{_qt5_bindir}:$PATH
 desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 desktop-file-validate %{buildroot}%{_datadir}/applications/dde-computer.desktop ||:
 desktop-file-validate %{buildroot}%{_datadir}/applications/dde-trash.desktop ||:
+desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 
 %ldconfig_scriptlets
 
@@ -113,7 +125,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-trash.desktop ||:
 %{_bindir}/%{name}-daemon
 %{_bindir}/%{name}-pkexec
 %{_bindir}/dde-property-dialog
-/usr/lib/systemd/system/dde-filemanager-daemon.service
+/lib/systemd/system/dde-filemanager-daemon.service
+
+%{_datadir}/applications/dde-open.desktop
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/dbus-1/interfaces/com.deepin.filemanager.filedialog.xml
 %{_datadir}/dbus-1/interfaces/com.deepin.filemanager.filedialogmanager.xml
@@ -137,6 +151,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-trash.desktop ||:
 %{_datadir}/dde-file-manager/mimetypes/image.mimetype
 %{_datadir}/dde-file-manager/mimetypes/text.mimetype
 %{_datadir}/dde-file-manager/mimetypes/video.mimetype
+%{_datadir}/dde-file-manager/templates/newDoc.wps
+%{_datadir}/dde-file-manager/templates/newExcel.et
+%{_datadir}/dde-file-manager/templates/newPowerPoint.dps
 %{_datadir}/dde-file-manager/templates/newDoc.doc
 %{_datadir}/dde-file-manager/templates/newExcel.xls
 %{_datadir}/dde-file-manager/templates/newPowerPoint.ppt
@@ -167,13 +184,16 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-trash.desktop ||:
 %files -n dde-desktop
 %{_bindir}/dde-desktop
 %{_datadir}/applications/dde-computer.desktop
-%exclude %{_datadir}/applications/dde-open.desktop
+%{_datadir}/applications/dde-home.desktop
 %{_datadir}/applications/dde-trash.desktop
 %dir %{_datadir}/dde-desktop
 %{_datadir}/dde-desktop/translations/
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Thu Jul 08 2021 weidong <weidong@uniontech.com> - 5.2.0.56-10
+- Update 5.2.0.56.
+
 * Tue Sep 8 2020 chenbo pan <panchenbo@uniontech.com> - 5.1.2.3-9
 - fix compile error
 * Mon Aug 17 2020 chenbo pan <panchenbo@uniontech.com> - 5.1.2.3-8

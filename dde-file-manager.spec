@@ -1,6 +1,11 @@
+# Disable debugsourcefiles
+%ifarch riscv64
+%global _debugsource_template %{nil}
+%endif
+
 Name:           dde-file-manager
 Version:        5.2.0.56
-Release:        1
+Release:        2
 Summary:        Deepin File Manager
 License:        GPLv3
 URL:            https://github.com/linuxdeepin/dde-file-manager
@@ -103,7 +108,13 @@ sed -i 's|/lib/dde-dock/plugins|/lib64/dde-dock/plugins|' dde-dock-plugins/disk-
 
 %build
 export PATH=%{_qt5_bindir}:$PATH
+%ifarch riscv64
+%qmake_qt5 QMAKE_CFLAGS_DEBUG="-latomic" QMAKE_CXXFLAGS_DEBUG="-latomic" QMAKE_LFLAGS_DEBUG="-latomic" \
+    QMAKE_CFLAGS_RELEASE="-latomic" QMAKE_CXXFLAGS_RELEASE="-latomic"  QMAKE_LFLAGS_RELEASE="-latomic" \
+    PREFIX=%{_prefix} QMAKE_CFLAGS_ISYSTEM= CONFIG+="DISABLE_FFMPEG DISABLE_ANYTHING"
+%else
 %qmake_qt5 PREFIX=%{_prefix} QMAKE_CFLAGS_ISYSTEM= CONFIG+="DISABLE_FFMPEG DISABLE_ANYTHING"
+%endif
 %make_build
 
 %install
@@ -191,6 +202,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Fri Jun 10 2022 misaka00251 <misaka00251@misakanet.cn> - 5.2.0.56-2
+- Fix compiling on RISC-V
+
 * Thu Jul 08 2021 weidong <weidong@uniontech.com> - 5.2.0.56-10
 - Update 5.2.0.56.
 

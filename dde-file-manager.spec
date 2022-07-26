@@ -1,6 +1,6 @@
 %define specrelease 8%{?dist}
 %if 0%{?openeuler}
-%define specrelease 1
+%define specrelease 2
 %endif
 
 Name:           dde-file-manager
@@ -67,13 +67,13 @@ Requires:       dde-desktop
 Requires:       jemalloc
 Requires:       libglvnd-glx
 Requires:       libdde-file-manager
-Requires:       cryfs
 Requires:		deepin-anything-dkms deepin-anything-server
 #Requires:       gvfs-client
 #Requires:       samba
 #Requires:       xdg-user-dirs
 #Requires:       gstreamer-plugins-good
 Recommends:     deepin-manual
+Recommends:     cryfs
 
 %description
 File manager front end of Deepin OS.
@@ -226,6 +226,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Tue Jul 26 2022 liweiganga <liweiganga@uniontech.com> - 5.2.39-2
+- modify cryfs Requires to Recommends
+
 * Mon Jul 18 2022 konglidong <konglidong@uniontech.com> - 5.2.39-1
 - update version to 5.2.39
 

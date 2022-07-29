@@ -1,20 +1,26 @@
+%define specrelease 8%{?dist}
+%if 0%{?openeuler}
+%define specrelease 2
+%endif
+
 Name:           dde-file-manager
-Version:        5.2.0.56
-Release:        1
+Version:        5.2.39
+Release:        %{specrelease}
 Summary:        Deepin File Manager
 License:        GPLv3
 URL:            https://github.com/linuxdeepin/dde-file-manager
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{name}_%{version}.orig.tar.xz	
 
 BuildRequires:  gcc-c++
 BuildRequires:  desktop-file-utils
 BuildRequires:  deepin-gettext-tools
 BuildRequires:  dde-dock-devel
 BuildRequires:  file-devel
+#BuildRequires:  jemalloc-devel
+#BuildRequires:  cmake(KF5Codecs)
 BuildRequires:  pkgconfig(atk)
-BuildRequires:  dtkcore-devel
 BuildRequires:  dtkgui-devel
-BuildRequires:  dtkwidget-devel
+BuildRequires:  pkgconfig(dtkwidget) >= 5.1
 BuildRequires:  pkgconfig(dframeworkdbus) >= 2.0
 BuildRequires:  pkgconfig(gtk+-2.0)
 BuildRequires:  pkgconfig(gsettings-qt)
@@ -32,10 +38,12 @@ BuildRequires:  pkgconfig(Qt5X11Extras)
 BuildRequires:  qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 BuildRequires:  pkgconfig(taglib)
+#BuildRequires:  pkgconfig(uchardet)
 BuildRequires:  pkgconfig(xcb-util)
 BuildRequires:  pkgconfig(xcb-ewmh)
 BuildRequires:  qt5-linguist
 BuildRequires:  jemalloc-devel
+#BuildRequires:  udisks2-qt5
 BuildRequires:  udisks2-qt5-devel
 BuildRequires:  disomaster-devel
 BuildRequires:  libgio-qt libgio-qt-devel
@@ -43,12 +51,29 @@ BuildRequires:  openssl-devel
 BuildRequires:  libqtxdg-devel
 BuildRequires:  libmediainfo-devel
 BuildRequires:  kf5-kcodecs-devel
+#BuildRequires:  libudisks2-qt5-devel
+BuildRequires:  lucene++-devel
+BuildRequires:  htmlcxx-devel
+BuildRequires:  libgsf-devel
+BuildRequires:  mimetic-devel
+BuildRequires:  boost-devel
+BuildRequires:	deepin-anything-devel deepin-anything-server
+
+# run command by QProcess
+#Requires:       deepin-shortcut-viewer
 Requires:       deepin-terminal
 Requires:       dde-desktop
+#Requires:       file-roller
 Requires:       jemalloc
 Requires:       libglvnd-glx
 Requires:       libdde-file-manager
+Requires:		deepin-anything-dkms deepin-anything-server
+#Requires:       gvfs-client
+#Requires:       samba
+#Requires:       xdg-user-dirs
+#Requires:       gstreamer-plugins-good
 Recommends:     deepin-manual
+Recommends:     cryfs
 
 %description
 File manager front end of Deepin OS.
@@ -71,6 +96,8 @@ Requires:       libzen
 Requires:       udisks2-qt5
 Requires:       taglib
 Requires:       libgio-qt
+Requires:		deepin-anything-libs
+
 
 %description -n libdde-file-manager
 DDE File Manager library.
@@ -93,17 +120,19 @@ Requires:       dde-session-ui
 Deepin desktop environment - desktop module.
 
 %prep
-%autosetup -c -n %{name}-%{version}
+%setup -q -n %{name}-%{version}
 
-
+# fix file permissions
 find -type f -perm 775 -exec chmod 644 {} \;
-sed -i '/deepin-daemon/s|lib|libexec|' dde-zone/mainwindow.h
-sed -i 's|lib/gvfs|libexec|' %{name}-lib/gvfs/networkmanager.cpp
-sed -i 's|/lib/dde-dock/plugins|/lib64/dde-dock/plugins|' dde-dock-plugins/disk-mount/disk-mount.pro
+#sed -i '/target.path/s|lib|%{_lib}|' src/dde-dock-plugins/disk-mount/disk-mount.pro
+sed -i '/deepin-daemon/s|lib|libexec|' src/dde-zone/mainwindow.h
+sed -i 's|lib/gvfs|libexec|' src/%{name}-lib/gvfs/networkmanager.cpp
+#sed -i 's|%{_datadir}|%{_libdir}|' dde-sharefiles/appbase.pri
+sed -i 's|/lib/dde-dock/plugins|/lib64/dde-dock/plugins|' src/dde-dock-plugins/disk-mount/disk-mount.pro
 
 %build
 export PATH=%{_qt5_bindir}:$PATH
-%qmake_qt5 PREFIX=%{_prefix} QMAKE_CFLAGS_ISYSTEM= CONFIG+="DISABLE_FFMPEG DISABLE_ANYTHING"
+%qmake_qt5 PREFIX=%{_prefix} QMAKE_CFLAGS_ISYSTEM= CONFIG+="DISABLE_FFMPEG"  DEFINES+="VERSION=%{version}" filemanager.pro
 %make_build
 
 %install
@@ -124,8 +153,12 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_bindir}/%{name}
 %{_bindir}/%{name}-daemon
 %{_bindir}/%{name}-pkexec
+%ifnarch x86_64
+%{_bindir}/*.sh
+%{_sysconfdir}/xdg/autostart/dde-file-manager-autostart.desktop
+%endif
 %{_bindir}/dde-property-dialog
-/lib/systemd/system/dde-filemanager-daemon.service
+/usr/lib/systemd/system/dde-filemanager-daemon.service
 
 %{_datadir}/applications/dde-open.desktop
 %{_datadir}/applications/%{name}.desktop
@@ -136,6 +169,8 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_datadir}/dbus-1/system-services/com.deepin.filemanager.daemon.service
 %{_datadir}/polkit-1/actions/com.deepin.filemanager.daemon.policy
 %{_datadir}/polkit-1/actions/com.deepin.pkexec.dde-file-manager.policy
+%{_datadir}/deepin-manual/manual-assets/application/dde-file-manager
+%{_datadir}/applications/context-menus/.readme
 
 %files -n libdde-file-manager
 %{_libdir}/dde-file-manager/plugins/previews/libdde-image-preview-plugin.so
@@ -164,14 +199,14 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_datadir}/icons/hicolor/scalable/apps/dde-file-manager.svg
 %{_libdir}/libdde-file-manager.so.1
 %{_libdir}/libdde-file-manager.so.1.8
+%ifarch x86_64
+%{_libdir}/deepin-anything-server-lib/plugins/handlers/libdde-anythingmonitor.so
+%endif
 
 %files -n dde-disk-mount-plugin
 %{_libdir}/dde-dock/plugins/system-trays/libdde-disk-mount-plugin.so
 %{_datadir}/dde-disk-mount-plugin/translations
 %{_datadir}/glib-2.0/schemas/com.deepin.dde.dock.module.disk-mount.gschema.xml
-
-
-
 
 %files devel
 %{_includedir}/%{name}/*.h
@@ -191,6 +226,12 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Tue Jul 26 2022 liweiganga <liweiganga@uniontech.com> - 5.2.39-2
+- modify cryfs Requires to Recommends
+
+* Mon Jul 18 2022 konglidong <konglidong@uniontech.com> - 5.2.39-1
+- update version to 5.2.39
+
 * Thu Jul 08 2021 weidong <weidong@uniontech.com> - 5.2.0.56-10
 - Update 5.2.0.56.
 

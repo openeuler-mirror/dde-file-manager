@@ -1,6 +1,6 @@
 %define specrelease 8%{?dist}
 %if 0%{?openeuler}
-%define specrelease 2
+%define specrelease 3
 %endif
 
 Name:           dde-file-manager
@@ -115,6 +115,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       dde-dock
 Requires:       dde-launcher
 Requires:       dde-session-ui
+Requires:       tinyxml2
 
 %description -n dde-desktop
 Deepin desktop environment - desktop module.
@@ -226,6 +227,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Tue Aug 02 2022 liweiganga <liweiganga@uniontech.com> - 5.2.39-3
+- add requires
+
 * Tue Jul 26 2022 liweiganga <liweiganga@uniontech.com> - 5.2.39-2
 - modify cryfs Requires to Recommends
 

@@ -1,0 +1,30 @@
+From b791b385720b4ecac58cd0771e32f8606dbe9e3b Mon Sep 17 00:00:00 2001
+From: loong ci <loong_c@yeah.net>
+Date: Fri, 5 Aug 2022 09:55:37 +0800
+Subject: [PATCH] hide authorized watermask
+
+---
+ src/dde-desktop/view/watermaskframe.cpp | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/dde-desktop/view/watermaskframe.cpp b/src/dde-desktop/view/watermaskframe.cpp
+index 45efe3a..c6bd12e 100644
+--- a/src/dde-desktop/view/watermaskframe.cpp
++++ b/src/dde-desktop/view/watermaskframe.cpp
+@@ -341,9 +341,10 @@ void WaterMaskFrame::initUI()
+ bool WaterMaskFrame::isNeedState()
+ {
+     DSysInfo::DeepinType deepinType = DSysInfo::deepinType();
+-    return (DSysInfo::DeepinType::DeepinProfessional == deepinType
+-            || DSysInfo::DeepinType::DeepinPersonal == deepinType
+-            || DSysInfo::DeepinType::DeepinServer == deepinType );
++    //return (DSysInfo::DeepinType::DeepinProfessional == deepinType
++    //        || DSysInfo::DeepinType::DeepinPersonal == deepinType
++    //        || DSysInfo::DeepinType::DeepinServer == deepinType );
++    return -1;
+ }
+ 
+ bool WaterMaskFrame::parseJson(QString key)
+-- 
+2.20.1
+

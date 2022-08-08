@@ -1,6 +1,6 @@
 %define specrelease 8%{?dist}
 %if 0%{?openeuler}
-%define specrelease 3
+%define specrelease 4
 %endif
 
 Name:           dde-file-manager
@@ -9,7 +9,8 @@ Release:        %{specrelease}
 Summary:        Deepin File Manager
 License:        GPLv3
 URL:            https://github.com/linuxdeepin/dde-file-manager
-Source0:        %{name}_%{version}.orig.tar.xz	
+Source0:        %{name}_%{version}.orig.tar.xz
+Patch0:         0001-hide-authorized-watermask.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  desktop-file-utils
@@ -122,6 +123,7 @@ Deepin desktop environment - desktop module.
 
 %prep
 %setup -q -n %{name}-%{version}
+%patch0 -p1
 
 # fix file permissions
 find -type f -perm 775 -exec chmod 644 {} \;
@@ -227,6 +229,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Fri Aug 05 2022 liweiganga <liweiganga@uniontech.com> - 5.2.39-4
+- delete authorized watermask
+
 * Tue Aug 02 2022 liweiganga <liweiganga@uniontech.com> - 5.2.39-3
 - add requires
 

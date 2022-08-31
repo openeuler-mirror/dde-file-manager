@@ -1,0 +1,82 @@
+Author: Jingwiw <wangjingwei@iscas.ac.cn>
+Date:   Sun Aug 28 10:28:38 2022 +0800
+
+       Solve link and file path problems that occur in riscv builds.
+
+diff --git a/src/common/common.pri b/src/common/common.pri
+index cace636..8c72e7e 100644
+--- a/src/common/common.pri
++++ b/src/common/common.pri
+@@ -74,6 +74,11 @@ unix {
+         QMAKE_CXXFLAGS += -O3 -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector-conversions -mloongson-ext2 -mloongson-mmi #-mmsa #龙芯4000使用的编译优化参数
+     }
+ 
++    isEqual(ARCH, riscv64){
++        QMAKE_CXXFLAGS += -O3
++        QMAKE_LFLAGS += -latomic -pthread
++    }
++
+     isEmpty(LIB_INSTALL_DIR) {
+         LIB_BASE_DIR = $$[QT_INSTALL_LIBS]/$$ProjectName
+     } else {
+diff --git a/src/dde-file-manager-lib/dde-file-manager-lib.pro b/src/dde-file-manager-lib/dde-file-manager-lib.pro
+index fd9c736..4be8fc8 100644
+--- a/src/dde-file-manager-lib/dde-file-manager-lib.pro
++++ b/src/dde-file-manager-lib/dde-file-manager-lib.pro
+@@ -92,7 +92,7 @@ include(interfaces/vfs/vfs.pri)
+ include(interfaces/customization/customization.pri)
+ include(src.pri)
+ 
+-isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64){
++isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64) | isEqual(ARCH, riscv64){
+     include(search/dfsearch.pri)
+ }
+ 
+diff --git a/src/dde-file-manager-plugins/pluginPreview/pluginPreview.pro b/src/dde-file-manager-plugins/pluginPreview/pluginPreview.pro
+index b6b6990..0cc76f5 100644
+--- a/src/dde-file-manager-plugins/pluginPreview/pluginPreview.pro
++++ b/src/dde-file-manager-plugins/pluginPreview/pluginPreview.pro
+@@ -9,7 +9,7 @@ SUBDIRS += \
+ ARCH = $$QMAKE_HOST.arch
+ 
+ !CONFIG(DISABLE_FFMPEG):!isEqual(BUILD_MINIMUM, YES) {
+-    !isEqual(ARCH, sw_64):!isEqual(ARCH, mips64):!isEqual(ARCH, mips32) {
++    !isEqual(ARCH, sw_64):!isEqual(ARCH, mips64):!isEqual(ARCH, mips32):!isEqual(ARCH, riscv64) {
+         SUBDIRS += dde-video-preview-plugin
+     }
+ }
+diff --git a/src/dde-file-manager/dde-file-manager.pro b/src/dde-file-manager/dde-file-manager.pro
+index 0863c6f..57c68b4 100644
+--- a/src/dde-file-manager/dde-file-manager.pro
++++ b/src/dde-file-manager/dde-file-manager.pro
+@@ -69,7 +69,7 @@ DEFINES += APPSHAREDIR=\\\"$$PREFIX/share/$$TARGET\\\"
+ target.path = $$BINDIR
+ 
+ desktop.path = $${PREFIX}/share/applications/
+-isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64) {
++isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64) | isEqual(ARCH, riscv64) {
+     desktop.files = $$PWD/mips/$${TARGET}.desktop \
+                     dde-open.desktop
+ }else{
+@@ -91,7 +91,7 @@ manual.path = /usr/share/deepin-manual/manual-assets/application
+ 
+ INSTALLS += target desktop policy pkexec propertyDialogShell manual
+ 
+-isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64) {
++isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64) | isEqual(ARCH, riscv64) {
+     dde-mips-shs.path = $$BINDIR
+     dde-mips-shs.files = $$PWD/mips/dde-computer.sh \
+                          $$PWD/mips/dde-trash.sh \
+diff --git a/tests/dde-file-manager-plugins/pluginPreview/test-pluginPreview.pro b/tests/dde-file-manager-plugins/pluginPreview/test-pluginPreview.pro
+index 42697d9..3a5362a 100644
+--- a/tests/dde-file-manager-plugins/pluginPreview/test-pluginPreview.pro
++++ b/tests/dde-file-manager-plugins/pluginPreview/test-pluginPreview.pro
+@@ -9,7 +9,7 @@ SUBDIRS += \
+ ARCH = $$QMAKE_HOST.arch
+ 
+ !CONFIG(DISABLE_FFMPEG):!isEqual(BUILD_MINIMUM, YES) {
+-    !isEqual(ARCH, sw_64):!isEqual(ARCH, mips64):!isEqual(ARCH, mips32) {
++    !isEqual(ARCH, sw_64):!isEqual(ARCH, mips64):!isEqual(ARCH, mips32):!isEqual(ARCH, riscv64) {
+         SUBDIRS += dde-video-preview-plugin/test-dde-video-preview-plugin.pro
+     }
+ }

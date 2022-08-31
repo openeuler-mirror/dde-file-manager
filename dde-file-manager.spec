@@ -1,6 +1,6 @@
 %define specrelease 8%{?dist}
 %if 0%{?openeuler}
-%define specrelease 4
+%define specrelease 5
 %endif
 
 Name:           dde-file-manager
@@ -11,6 +11,8 @@ License:        GPLv3
 URL:            https://github.com/linuxdeepin/dde-file-manager
 Source0:        %{name}_%{version}.orig.tar.xz
 Patch0:         0001-hide-authorized-watermask.patch
+Patch1000:      fix-support-for-risc-v.patch
+Patch1001:      riscv-link-and-file-path.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  desktop-file-utils
@@ -124,6 +126,10 @@ Deepin desktop environment - desktop module.
 %prep
 %setup -q -n %{name}-%{version}
 %patch0 -p1
+%ifarch riscv64
+%patch1000 -p1
+%patch1001 -p1
+%endif
 
 # fix file permissions
 find -type f -perm 775 -exec chmod 644 {} \;
@@ -229,6 +235,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Tue Aug 23 2022 misaka00251 <misaka00251@misakanet.cn> - 5.2.39-5
+- Fix compiling on RISC-V
+- Special thanks to @Jingwiw
+
 * Fri Aug 05 2022 liweiganga <liweiganga@uniontech.com> - 5.2.39-4
 - delete authorized watermask
 

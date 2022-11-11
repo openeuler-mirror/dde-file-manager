@@ -1,6 +1,6 @@
-%define specrelease 8%{?dist}
+%define specrelease 9%{?dist}
 %if 0%{?openeuler}
-%define specrelease 4
+%define specrelease 5
 %endif
 
 Name:           dde-file-manager
@@ -59,6 +59,7 @@ BuildRequires:  libgsf-devel
 BuildRequires:  mimetic-devel
 BuildRequires:  boost-devel
 BuildRequires:	deepin-anything-devel deepin-anything-server
+BuildRequires:  pcre-devel
 
 # run command by QProcess
 #Requires:       deepin-shortcut-viewer
@@ -229,6 +230,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Fri Nov 11 2022 liweiganga <liweiganga@uniontech.com> - 5.2.39-5
+- add BR pcre-devel
+
 * Fri Aug 05 2022 liweiganga <liweiganga@uniontech.com> - 5.2.39-4
 - delete authorized watermask
 

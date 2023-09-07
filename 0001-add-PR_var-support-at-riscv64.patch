@@ -1,0 +1,127 @@
+From 442cc197f7e4f16411ed7aab0c0b492970a57685 Mon Sep 17 00:00:00 2001
+From: zhangxianting <zhangxianting@zhangxianting@uniontech.com>
+Date: Sun, 27 Aug 2023 11:07:04 +0800
+Subject: [PATCH] add PR_var support at riscv64
+
+---
+ .../charsetdetect/nspr-emu/prcpucfg_linux.h        | 50 +++++++++++++++++++
+ src/common/common.pri                              |  5 ++
+ src/dde-file-manager/dde-file-manager.pro          |  5 +-
+ src/dde-file-manager-lib/dde-file-manager-lib.pro  |  2 +- 
+ 4 files changed, 59 insertions(+), 3 deletions(-)
+
+diff --git a/3rdparty/charsetdetect/nspr-emu/prcpucfg_linux.h b/3rdparty/charsetdetect/nspr-emu/prcpucfg_linux.h
+index 776c21e..afb7415 100644
+--- a/3rdparty/charsetdetect/nspr-emu/prcpucfg_linux.h
++++ b/3rdparty/charsetdetect/nspr-emu/prcpucfg_linux.h
+@@ -645,6 +645,56 @@
+ #define PR_BYTES_PER_WORD_LOG2   2
+ #define PR_BYTES_PER_DWORD_LOG2  3
+ 
++#elif defined(__riscv64__)
++
++#define IS_LITTLE_ENDIAN 1
++#undef  IS_BIG_ENDIAN
++#define IS_64
++
++#define PR_BYTES_PER_BYTE   1
++#define PR_BYTES_PER_SHORT  2
++#define PR_BYTES_PER_INT    4
++#define PR_BYTES_PER_INT64  8
++#define PR_BYTES_PER_LONG   8
++#define PR_BYTES_PER_FLOAT  4
++#define PR_BYTES_PER_DOUBLE 8
++#define PR_BYTES_PER_WORD   8
++#define PR_BYTES_PER_DWORD  8
++
++#define PR_BITS_PER_BYTE    8
++#define PR_BITS_PER_SHORT   16
++#define PR_BITS_PER_INT     32
++#define PR_BITS_PER_INT64   64
++#define PR_BITS_PER_LONG    64
++#define PR_BITS_PER_FLOAT   32
++#define PR_BITS_PER_DOUBLE  64
++#define PR_BITS_PER_WORD    64
++
++#define PR_BITS_PER_BYTE_LOG2   3
++#define PR_BITS_PER_SHORT_LOG2  4
++#define PR_BITS_PER_INT_LOG2    5
++#define PR_BITS_PER_INT64_LOG2  6
++#define PR_BITS_PER_LONG_LOG2   6
++#define PR_BITS_PER_FLOAT_LOG2  5
++#define PR_BITS_PER_DOUBLE_LOG2 6
++#define PR_BITS_PER_WORD_LOG2   6
++
++#define PR_ALIGN_OF_SHORT   2
++#define PR_ALIGN_OF_INT     4
++#define PR_ALIGN_OF_LONG    8
++#define PR_ALIGN_OF_INT64   8
++#define PR_ALIGN_OF_FLOAT   4
++#define PR_ALIGN_OF_DOUBLE  8
++#define PR_ALIGN_OF_POINTER 8
++#define PR_ALIGN_OF_WORD    8
++
++#define PR_BYTES_PER_WORD_LOG2  3
++#define PR_BYTES_PER_DWORD_LOG2 3
++
++
++#define PR_BYTES_PER_WORD_LOG2  3
++#define PR_BYTES_PER_DWORD_LOG2 3
++
+ #else
+ 
+ #error "Unknown CPU architecture"
+diff --git a/src/common/common.pri b/src/common/common.pri
+index cace636..7930a92 100644
+--- a/src/common/common.pri
++++ b/src/common/common.pri
+@@ -64,6 +64,11 @@ unix {
+         DEFINES += arm
+         DEFINES += __arm__
+     }
++    isEqual(ARCH, riscv64){
++        DEFINES += riscv64
++        DEFINES += __riscv64__
++    }
++    
+     #优化通过指定 -Wl,--as-needed 选项，链接过程中，链接器会检查所有的依赖库，没有实际被引用的库，不再写入可执行文件头。最终生成的可执行文件头中包含的都是必要的链接库信息
+     QMAKE_CXX += -Wl,--as-need -ffunction-sections -fdata-sections -Wl,--gc-sections -Wl,-O1
+     QMAKE_CXXFLAGS += -Wl,--as-need -fPIE -ffunction-sections -fdata-sections -Wl,--gc-sections -Wl,-O1
+diff --git a/src/dde-file-manager/dde-file-manager.pro b/src/dde-file-manager/dde-file-manager.pro
+index 0863c6f..a401bcf 100644
+--- a/src/dde-file-manager/dde-file-manager.pro
++++ b/src/dde-file-manager/dde-file-manager.pro
+@@ -69,7 +69,8 @@ DEFINES += APPSHAREDIR=\\\"$$PREFIX/share/$$TARGET\\\"
+ target.path = $$BINDIR
+ 
+ desktop.path = $${PREFIX}/share/applications/
+-isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64) {
++riscv64
++isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64) | isEqual(ARCH, riscv64) {
+     desktop.files = $$PWD/mips/$${TARGET}.desktop \
+                     dde-open.desktop
+ }else{
+@@ -91,7 +92,7 @@ manual.path = /usr/share/deepin-manual/manual-assets/application
+ 
+ INSTALLS += target desktop policy pkexec propertyDialogShell manual
+ 
+-isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64) {
++isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64) | isEqual(ARCH, riscv64) {
+     dde-mips-shs.path = $$BINDIR
+     dde-mips-shs.files = $$PWD/mips/dde-computer.sh \
+                          $$PWD/mips/dde-trash.sh \
+diff --git a/src/dde-file-manager-lib/dde-file-manager-lib.pro b/src/dde-file-manager-lib/dde-file-manager-lib.pro
+index fd9c736..6986d56 100644
+--- a/src/dde-file-manager-lib/dde-file-manager-lib.pro
++++ b/src/dde-file-manager-lib/dde-file-manager-lib.pro
+@@ -92,7 +92,7 @@ include(interfaces/vfs/vfs.pri)
+ include(interfaces/customization/customization.pri)
+ include(src.pri)
+ 
+-isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64){
++isEqual(ARCH, sw_64) | isEqual(ARCH, mips64) | isEqual(ARCH, mips32) | isEqual(ARCH, aarch64) | isEqual(ARCH, riscv64) {
+     include(search/dfsearch.pri)
+ }
+
+-- 
+2.39.1

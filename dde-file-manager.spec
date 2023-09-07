@@ -1,6 +1,6 @@
-%define specrelease 9%{?dist}
+%define specrelease 9%{?dist}.01
 %if 0%{?openeuler}
-%define specrelease 5
+%define specrelease 6
 %endif
 
 Name:           dde-file-manager
@@ -11,6 +11,7 @@ License:        GPLv3
 URL:            https://github.com/linuxdeepin/dde-file-manager
 Source0:        %{name}_%{version}.orig.tar.xz
 Patch0:         0001-hide-authorized-watermask.patch
+Patch1:         0001-add-PR_var-support-at-riscv64.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  desktop-file-utils
@@ -125,6 +126,7 @@ Deepin desktop environment - desktop module.
 %prep
 %setup -q -n %{name}-%{version}
 %patch0 -p1
+%patch1 -p1
 
 # fix file permissions
 find -type f -perm 775 -exec chmod 644 {} \;
@@ -230,6 +232,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dde-home.desktop ||:
 %{_datadir}/dbus-1/services/com.deepin.dde.desktop.service
 
 %changelog
+* Wed Sep 06 2023 zhangxianting <zhangxianting@uniontech.com> - 5.2.39-6
+- fix : fix building error at clang
+
 * Fri Nov 11 2022 liweiganga <liweiganga@uniontech.com> - 5.2.39-5
 - add BR pcre-devel
 
